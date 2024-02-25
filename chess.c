@@ -16,7 +16,7 @@ int main() {
     CLEAR;
     printf("1. Start New Game\n");
     printf("2. Resume\n");
-    printf("3. Cancel\n");
+    printf("3. Quit\n");
     printf("Enter option : ");
     if (!scanf(" %s", data))
         erroredEnd();
@@ -129,7 +129,7 @@ Set_t *createSet(COLOR color) {
 
     Soldier_t types[4] = {ROOK, KNIGHT, BISHOP, PAWN};
     switch (color) {
-    case BLACK:
+    case BLACK_TEAM:
         for (int i = 0; i < 3; i++) {
             s->soldiers[i].type = types[i];
             s->soldiers[7 - i].type = types[i];
@@ -140,7 +140,7 @@ Set_t *createSet(COLOR color) {
             s->soldiers[i].type = PAWN;
         }
         break;
-    case WHITE:
+    case WHITE_TEAM:
         for (int i = 0; i < 3; i++) {
             s->soldiers[8 + i].type = types[i];
             s->soldiers[15 - i].type = types[i];
@@ -540,12 +540,12 @@ Position choosePos(CHANGE change) {
     }
 
     switch (gdata->ACTIVE) {
-    case WHITE:
+    case WHITE_TEAM:
         pos.row = 8 - raw;
         pos.col = col - 65;
         return pos;
         break;
-    case BLACK:
+    case BLACK_TEAM:
         pos.row = raw - 1;
         pos.col = 'H' - col;
         return pos;
@@ -568,10 +568,10 @@ int moveSldr() {
 
     if (from->sldr->TEAM->color != gdata->ACTIVE) {
         switch (gdata->ACTIVE) {
-        case WHITE:
+        case WHITE_TEAM:
             printf("White change\n");
             break;
-        case BLACK:
+        case BLACK_TEAM:
             printf("Black change\n");
             break;
         }
@@ -602,9 +602,6 @@ int moveSldr() {
         }
 
         if (from->sldr->type == PAWN) {
-            if (from->sldr->otherdt->NMOVES < MORE_THAN_ONE)
-                (from->sldr->otherdt->NMOVES)++;
-
             for (int i = 0; i < 8; i++) {
                 if (gdata->board->sets[1]->soldiers[i].otherdt->enpassant)
                     gdata->board->sets[1]->soldiers[i].otherdt->enpassant = false;
@@ -613,13 +610,12 @@ int moveSldr() {
                         false;
             }
 
-            if (pos.row == 3) {
-                if (from->sldr->otherdt->NMOVES == ZERO) {
-                    from->sldr->otherdt->enpassant = true;
-                } /* else
-                     from->sldr->otherdt->enpassant = COULD_BE;
-                 */
+            if (pos.row == 4 && from->sldr->otherdt->NMOVES == ZERO) {
+                from->sldr->otherdt->enpassant = true;
             }
+
+            if (from->sldr->otherdt->NMOVES < MORE_THAN_ONE)
+                (from->sldr->otherdt->NMOVES)++;
 
             if (pos.row == 2 && pos.col != from->sldr->pos.col) {
                 gdata->board->Squares[from->sldr->pos.row][pos.col].sldr->State =
@@ -659,10 +655,10 @@ void drawBoard() {
     //
     CLEAR;
     switch (gdata->ACTIVE) {
-    case BLACK:
+    case BLACK_TEAM:
         drawWhileBlack();
         break;
-    case WHITE:
+    case WHITE_TEAM:
         drawWhileWhite();
         break;
     }
@@ -710,7 +706,7 @@ void drawWhileBlack() {
 
 void displaySq(Square *sq) {
     if (sq->occupied) {
-        if (sq->sldr->TEAM->color == BLACK) {
+        if (sq->sldr->TEAM->color == BLACK_TEAM) {
             printf(" \033[;31m%s\033[;0m ", sq->sldr->shap);
         } else {
             printf(" %s ", sq->sldr->shap);
@@ -831,11 +827,11 @@ char **initColor() {
 
 void initgdata() {
     gdata = malloc(sizeof(Data));
-    Set_t *white = createSet(WHITE);
-    Set_t *black = createSet(BLACK);
+    Set_t *white = createSet(WHITE_TEAM);
+    Set_t *black = createSet(BLACK_TEAM);
     gdata->colors = initColor();
     gdata->board = createBoard(white, black);
-    gdata->ACTIVE = WHITE;
+    gdata->ACTIVE = WHITE_TEAM;
     gdata->available = NULL;
     colorBoardSquares();
 }

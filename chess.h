@@ -11,11 +11,15 @@
 #define CLEAR system("cls")
 #endif
 
+#define WIN_WIDTH 800
+#define WIN_HEIGHT 800
+#define SQUARE_WIDTH (WIN_WIDTH / 8)
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
+#define isOdd(x) ((x) % 2)
 
 typedef enum { DEAD, LIVE, CANT_MOVE } SOLDIER_STATE;
-typedef enum { WHITE, BLACK } COLOR;
+typedef enum { WHITE_TEAM, BLACK_TEAM } COLOR;
 typedef enum { PAWN = 1, KNIGHT, BISHOP, ROOK, QUEEN, KING } Soldier_t;
 typedef enum { FROM, TO } CHANGE;
 typedef enum { ZERO, ONE, MORE_THAN_ONE } NM_OF_MOVES;
